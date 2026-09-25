@@ -1,0 +1,139 @@
+﻿@model HappyBlog.Models.ViewModels.EditViewModel
+@{
+    ViewData["Title"] = "Edit Post";
+}
+
+<style>
+    .container-wrapper {
+        padding: 20px;
+        max-width: 1000px;
+        margin: 0 auto;
+        font-family: sans-serif
+    }
+</style>
+
+
+<div class="container-wrapper">
+
+    <div class="row ">
+        <div class="col-6">
+            <h2>@ViewData["Title"]</h2>
+
+        </div>
+
+
+        <div class="col-6 text-end">
+            <a class="btn btn-primary" asp-controller="post" asp-action="Index">
+                Back To List
+            </a>
+        </div>
+
+    </div>
+    <hr />
+
+    <form asp-action="Edit" asp-controller="Post" method="post" enctype="multipart/form-data">
+
+        @*  <div class="validation-summary">
+           
+        </div> *@
+
+        @if (!ViewData.ModelState.IsValid && ViewData.ModelState.ErrorCount > 0)
+        {
+            <div class="alert alert-dismissible alert-danger validation-summary">
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                <div asp-validation-summary="All"></div>
+            </div>
+        }
+
+
+        <input asp-for="post.Id" type="hidden" /> @* THIS IS HIDDEN ID *@
+
+
+        <div class="form-group m-2">
+            <label asp-for="post.Title"></label>
+            <input asp-for="post.Title" class="form-control" />
+            <span asp-validation-for="post.Title" class="text-danger"></span>
+
+
+
+        </div>
+
+        <div class="form-group m-2">
+            <label asp-for="post.CategoryId"></label>
+            <select asp-for="post.CategoryId" asp-items="Model.Categories" class="form-control">
+                <option value="">Select Categories</option>
+            </select>
+            <span asp-validation-for="post.CategoryId"></span>
+
+
+
+        </div>
+
+
+
+        <div class="form-group m-2">
+            <label asp-for="post.Author"></label>
+            <input asp-for="post.Author" class="form-control" />
+            <span asp-validation-for="post.Author" class="text-danger"></span>
+
+
+
+        </div>
+
+        @* HERE SOME CHANGES DONE *@
+        <div class="form-group m-2">
+            <label asp-for="post.Content"></label>
+            <textarea asp-for="post.Content" id="summernote-editor" class="form-control" rows="5"></textarea>
+            <span asp-validation-for="post.Content" class="text-danger"></span>
+        </div>
+
+
+        <div class="form-group m-2">
+            <label asp-for="FeatureImages"></label>
+            <input asp-for="FeatureImages" class="form-control" />
+
+        </div>
+
+        <button type="submit" class="btn btn-primary mt-2">Update</button>
+        <a class="btn btn-secondary mt-2" asp-controller="post" asp-action="Index"> Back to list</a>
+
+
+    </form>
+
+
+
+</div>
+@* GO TO THE LAYOUTSECTION *@
+@section Styles {
+    <link href="https://cdn.jsdelivr.net/npm/summernote@0.9.0/dist/summernote-bs5.min.css" rel="stylesheet">
+}
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/summernote@0.9.0/dist/summernote-bs5.min.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            $('#summernote-editor').summernote({
+                placeholder: 'Start typing your blog post...',
+                tabsize: 2,
+                height: 300,
+                // Define which font sizes appear in the dropdown
+                fontSizes: ['8', '9', '10', '11', '12', '14', '18', '24', '36', '48', '64', '72'],
+                styleTags: ['p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'],
+                toolbar: [
+                    // Headings and Paragraph style
+                    ['style', ['style']],
+                    // Bold, Italic, Underline, and now FONT SIZE
+                    ['font', ['bold', 'italic', 'underline', 'clear']],
+                    ['fontsize', ['fontsize']],
+                    // Lists
+                    ['para', ['ul', 'ol', 'paragraph']],
+                    // Links
+                    ['insert', ['link']],
+                    // View mode
+                    ['view', ['fullscreen', 'codeview']]
+                ]
+            });
+        });
+    </script>
+}

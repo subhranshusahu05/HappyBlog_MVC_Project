@@ -1,0 +1,165 @@
+﻿@model Post
+@{
+    ViewData["Title"] = Model.Title;
+
+}
+<style>
+    .container-wrapper {
+        padding: 20px;
+        max-width: 1000px;
+        margin: 0 auto;
+        font-family: sans-serif
+    }
+
+    .feature-image {
+        max-height: 500px;
+        object-fit: cover;
+        width: 100%;
+        margin-bottom: 20px;
+    }
+</style>
+
+
+
+@if (User.IsInRole("Admin"))
+{
+
+    <div class="text-end ">
+        <a class="btn btn-primary btn-sm mx-3 my-3" asp-action="Edit" asp-controller="Post" asp-route-id="@Model.Id">Edit Post</a>
+        <a class="btn btn-danger btn-sm mx-3 my-3" asp-action="Delete" asp-controller="Post" asp-route-id="@Model.Id">Delete Post</a>
+
+    </div>
+}
+
+<div class="container-wrapper text-bg-light rounded-2 tab-content mt-3">
+    <h1>@Model.Title</h1>
+    <p> <span class="badge bg-primary">By:</span>@Model.Author  <span class="badge bg-primary">Published on: </span> @Model.PublishedDate.ToString("MMM dd yyyy")</p>
+
+    <p> <span class="badge bg-primary">Category:</span>  @Model.Category.Name   </p>
+
+    
+    <img src="@Model.FeatureImagePath" alt="@Model.Title" class="  feature-image  " />
+
+   
+
+    <hr />
+
+    <div>
+        @Html.Raw(Model.Content)
+    </div>
+
+
+    <hr />
+@if (Model.Comments.Any())
+{
+        <div id="commentSection">
+            @foreach (var comment in Model.Comments)
+            {
+                <div class="card mb-3 shadow-sm">
+
+                    <div class="card-body">
+
+
+                        <h5 class="card-title">@comment.UserName</h5>
+
+                        <p class="card-text text-muted">@comment.CommentDate.ToString("MMMM dd ,yyyy")</p>
+
+                        <p class="card-text text-muted">@comment.Content</p>
+
+
+
+                    </div>
+
+
+
+
+                </div>
+
+
+            }
+
+
+
+
+        </div>
+
+
+
+
+}
+else
+{
+        <p class="text-muted">No comments yet Be the first to comment</p>
+}
+
+
+        @if (User.Identity.IsAuthenticated)
+    {
+    <h4>Add a Comment</h4>
+        <form id="commentform">
+
+            <div class="form-group">
+                <label for="UserName">Name</label>
+                <input for="UserName" type="text" class="form-control" id="UserName" name="UserName" required />
+
+
+            </div>
+
+
+
+            <div class="form-group">
+                <label for="Content">Content</label>
+                <textarea for="Content" class="form-control" id="Content" name="Content" rows="4" required></textarea>
+
+
+            </div>
+
+            <button type="submit" class="btn btn-primary mt-2 rounded-2">Submit Comment</button>
+
+        </form>
+    }
+    @section Scripts {
+        <script>
+            $(document).ready(function () {
+
+                $("#commentform").submit(function (event) {
+                    event.preventDefault();
+
+                    var postId = @Model.Id;
+                    var userName = $("#UserName").val();
+                    var content = $("#Content").val();
+
+                    $.ajax({
+                        type: 'POST',
+                        url: '@Url.Action("AddComment", "Post")',
+                        contentType: "application/json; charset=utf-8",
+                        data: JSON.stringify({
+                            PostId: postId,
+                            UserName: userName,
+                            Content: content
+                        }),
+                        success: function (response) {
+
+                            $("#commentSection").append(`
+                                <div class="card mb-3 shadow-sm">
+                                    <div class="card-body">
+                                        <h5 class="card-title">${response.username}</h5>
+                                        <p class="card-text text-muted">${response.commentDate}</p>
+                                        <p class="card-text">${response.content}</p>
+                                    </div>
+                                </div>
+                            `);
+
+                            // Optional: clear form
+                            $("#UserName").val('');
+                            $("#Content").val('');
+                        },
+                        error: function (error) {
+                            console.log("Error while adding comment", error);
+                        }
+                    });
+                });
+
+            });
+        </script>
+}
